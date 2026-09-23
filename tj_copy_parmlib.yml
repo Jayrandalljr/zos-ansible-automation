@@ -1,0 +1,25 @@
+---
+#------------------------------------------------------------ 
+# Demonstrates how to issue a TSO command through Ansible.
+# This example does a LISTUSER command to get the RACF
+# profile of a RACF user. Then it looks for specific values
+# in the returned data, demonstrating how to navigate a
+# JSON document that Ansible returns.
+#
+# -e "userid=USERID"
+#------------------------------------------------------------ 
+- name: Get RACF profile for a given userid
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Copy SYS1.PARMLIB to STUDENT4.SYS1.PARMLIB
+      ibm.ibm_zos_core.zos_copy:
+        src: SYS1.PARMLIB
+        dest: STUDENT4.SYS1.PARMLIB
+        remote_src: true
+
+
