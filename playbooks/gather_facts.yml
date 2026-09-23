@@ -1,6 +1,7 @@
 ---
 - name: Gather facts from z/OS
-  hosts: zoslab
+  # hosts: zoslab
+  hosts: zos
   gather_facts: false
   tasks:
     - name: Gather z/OS facts
