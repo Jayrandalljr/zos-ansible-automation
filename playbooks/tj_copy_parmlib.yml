@@ -9,7 +9,7 @@
 # -e "userid=USERID"
 #------------------------------------------------------------ 
 - name: Get RACF profile for a given userid
-  hosts: mainframe
+  hosts: zoslab
   gather_facts: false
   collections:
     - ibm.ibm_zos_core
