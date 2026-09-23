@@ -11,8 +11,9 @@
 - name: Get RACF profile for a given userid
   hosts: zoslab
   gather_facts: false
-  # collections:
-  #   - ibm.ibm_zos_core
+  collections:
+    - name: ibm.ibm_zos_core
+      version: "1.10.0"
   environment: "{{ environment_vars }}"
 
   tasks:
