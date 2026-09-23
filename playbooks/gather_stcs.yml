@@ -1,0 +1,10 @@
+---
+- name: Gather all z/OS STCs
+  hosts: zos
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Display all started tasks
+      ibm.ibm_zos_core.zos_job_query:
+        job_name: "STC*"
