@@ -1,7 +1,8 @@
 ---
-- name: Gather facts from z/OS
+- name: Display environment variables at runtime
   hosts: zoslab
-  # hosts: zos
+  gather_facts: false
+  environment: "{{ environment_vars }}"
   gather_facts: false
   tasks:
     - name: Gather z/OS facts
