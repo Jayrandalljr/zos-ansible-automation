@@ -1,24 +1,23 @@
 ---
-#------------------------------------------------------------ 
-# Demonstrates how to issue a TSO command through Ansible.
-# This example does a LISTUSER command to get the RACF
-# profile of a RACF user. Then it looks for specific values
-# in the returned data, demonstrating how to navigate a
-# JSON document that Ansible returns.
-#
-# -e "userid=USERID"
-#------------------------------------------------------------ 
-- name: Get RACF profile for a given userid
+- name: Display environment variables at runtime
   hosts: zoslab
   gather_facts: false
-  collections:
-    - ibm.ibm_zos_core
   environment: "{{ environment_vars }}"
 
   tasks:
-    - name: Copy SYS1.PARMLIB to STUDENT4.SYS1.PARMLIB
-      ibm.ibm_zos_core.zos_copy:
-        src: SYS1.PARMLIB
-        dest: STUDENT4.SYS1.PARMLIB
-        remote_src: true
+  - name: Display runtime environment
+    ansible.builtin.shell: |
+      echo "USER=$USER"
+      echo "ZOAU_HOME=$ZOAU_HOME"
+      echo "PATH=$PATH"
+      echo "LIBPATH=$LIBPATH"
+      echo "PYTHONPATH=$PYTHONPATH"
+      echo "PYTHON=$(command -v python)"
+      python --version
+      zoaversion
+    register: runtime_env
+    changed_when: false
 
+  - name: Show runtime environment
+    ansible.builtin.debug:
+      var: runtime_env.stdout_lines
