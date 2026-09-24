@@ -4,6 +4,24 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
+
+  - name: Display runtime environment
+    ansible.builtin.shell: |
+      echo "USER=$USER"
+      echo "ZOAU_HOME=$ZOAU_HOME"
+      echo "PATH=$PATH"
+      echo "LIBPATH=$LIBPATH"
+      echo "PYTHONPATH=$PYTHONPATH"
+      echo "PYTHON=$(command -v python)"
+      python --version
+      zoaversion
+    register: runtime_env
+    changed_when: false
+
+  - name: Show runtime environment
+    ansible.builtin.debug:
+      var: runtime_env.stdout_lines
+
   - name: Gather z/OS facts
     ibm.ibm_zos_core.zos_gather_facts:
 
