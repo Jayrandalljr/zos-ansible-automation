@@ -1,0 +1,7 @@
+//{{ job_owner }} JOB (ACCT),'LAB20',CLASS=A,MSGCLASS=H,MSGLEVEL=(1,1),
+//             NOTIFY=&SYSUID
+//CREATE   EXEC PGM=IEFBR14
+//TARGET   DD  DSN={{ hlq }}.{{ mlq }}.{{ libname }},
+//             DISP=(NEW,CATLG,DELETE),
+//             SPACE=(TRK,({{ primary_allocation }},{{ secondary_allocation }})),
+//             DCB=(DSORG=PO,RECFM=FB,LRECL=80,BLKSIZE=3120)

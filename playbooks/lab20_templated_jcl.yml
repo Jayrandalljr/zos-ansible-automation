@@ -1,0 +1,82 @@
+---
+# Lab 20: Render parameterized JCL locally, then submit it to z/OS.
+- name: Submit templated JCL to z/OS
+  hosts: zoslab
+  gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
+  environment: "{{ environment_vars }}"
+
+  vars:
+    job_owner: IBMUSER
+    hlq: PLAT01
+    mlq: DEV
+    libname: JCL
+    primary_allocation: 2
+    secondary_allocation: 4
+    jcl_directory: "{{ playbook_dir }}/tmp_jcl"
+    jcl_path: "{{ jcl_directory }}/rendered.jcl"
+    jcl_dataset_name: "{{ job_owner }}.TEMP.JCL"
+
+  tasks:
+    - name: Create a local directory for rendered JCL
+      ansible.builtin.file:
+        path: "{{ jcl_directory }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+
+    - name: Render JCL locally on the control node
+      ansible.builtin.template:
+        src: templates/provdev.jcl.j2
+        dest: "{{ jcl_path }}"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Show rendered JCL
+      ansible.builtin.command:
+        cmd: "cat {{ jcl_path }}"
+      delegate_to: localhost
+      changed_when: false
+      register: rendered_jcl
+
+    - name: Display rendered JCL
+      ansible.builtin.debug:
+        var: rendered_jcl.stdout_lines
+
+    - name: Delete temporary JCL data set if it exists
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ jcl_dataset_name }}"
+        state: absent
+
+    - name: Allocate temporary JCL data set
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ jcl_dataset_name }}"
+        type: seq
+        state: present
+        space_primary: 5
+        space_secondary: 3
+        space_type: trk
+        record_format: fb
+        record_length: 80
+
+    - name: Copy rendered JCL to z/OS
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ jcl_path }}"
+        dest: "{{ jcl_dataset_name }}"
+
+    - name: Submit rendered JCL
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ jcl_dataset_name }}"
+        location: data_set
+        wait: true
+        wait_time_s: 60
+        return_output: true
+      register: job_output
+
+    - name: Display job results
+      ansible.builtin.debug:
+        msg:
+          - "Job name: {{ job_output.jobs[0].job_name }}"
+          - "Job ID: {{ job_output.jobs[0].job_id }}"
+          - "Return code: {{ job_output.jobs[0].ret_code.msg }}"
