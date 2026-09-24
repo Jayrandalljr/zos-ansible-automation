@@ -21,10 +21,3 @@
   - name: Show runtime environment
     ansible.builtin.debug:
       var: runtime_env.stdout_lines
-
-  - name: Copy SYS1.PARMLIB to STUDENT4.SYS1.PARMLIB
-    ibm.ibm_zos_core.zos_copy:
-      src: SYS1.PARMLIB
-      dest: STUDENT4.SYS1.PARMLIB
-      remote_src: true
-
